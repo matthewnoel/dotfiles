@@ -1,6 +1,13 @@
 alias status='git status && git branch'
 alias notes='code ~/Desktop/today.md'
 alias ls='ls -la'
+alias zshrc='code ~/.zshrc'
+
+function get_main_branch {
+  local remote=$(git remote)
+  local main_branch=$(git remote show $remote | sed -n '/HEAD branch/s/.*: //p')
+  echo $main_branch
+}
 
 function start_work {
   local branch=$1
@@ -28,7 +35,8 @@ function start_work {
 
   local current_branch=$(git branch --show-current)
   echo "Current branch: '$current_branch'."
-  if [ "$current_branch" != "main" ]; then
+  local main_branch=$(get_main_branch)
+  if [ "$current_branch" != "$main_branch" ]; then
     echo "Cannot start if not on main branch."
     git branch
     return
@@ -58,7 +66,8 @@ function push_work {
 
   local branch=$(git branch --show-current)
   echo "Current branch: '$branch'."
-  if [ "$branch" = "main" ]; then
+  local main_branch=$(get_main_branch)
+  if [ "$branch" = "$main_branch" ]; then
     echo "Pushing from the main branch is not supported in this workflow."
     git branch
     return
@@ -98,14 +107,15 @@ function resolve_work {
 
   local branch=$(git branch --show-current)
   echo "Current branch: '$branch'."
-  if [ "$branch" = "main" ]; then
+  local main_branch=$(get_main_branch)
+  if [ "$branch" = "$main_branch" ]; then
     echo "Cannot clean up the main branch."
     git branch
     return
   fi
 
-  git checkout main
+  git checkout "$main_branch"
   git branch -D "$branch"
   git pull
-  echo "Status"
+  eval status
 }
