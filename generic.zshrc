@@ -119,3 +119,32 @@ function resolve_work {
   git pull
   eval status
 }
+
+function resolve_all {
+  local is_in_repository=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  if [ "$is_in_repository" != "true" ]; then
+    echo "Cannot clean branch if the current directory is not a git repository."
+    return
+  fi
+
+  local git_status=$(git status -s)
+  echo "Current status: $git_status"
+  if [ -n "$git_status" ]; then
+    echo "Cannot clean branch if there are current changes."
+    git status -s
+    return
+  fi
+
+  local branches=$(git branch --format="%(refname:short)")
+  local array_of_branches=(${(f)branches})
+  echo "Branches in the repository:"
+  for branch in $array_of_branches; do
+    if [ "$branch" = "$(get_main_branch)" ]; then
+      continue
+    fi
+    git checkout "$branch"
+    resolve_work
+    echo "Resolved branch '$branch'."
+  done
+}
+
