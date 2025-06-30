@@ -1,5 +1,5 @@
 alias status='git status && git branch'
-alias notes='code ~/Desktop/today.md'
+alias notes='code --new-window ~/Desktop/today.md'
 alias ls='ls -la'
 alias zshrc='code ~/.zshrc'
 
