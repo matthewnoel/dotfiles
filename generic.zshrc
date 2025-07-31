@@ -148,3 +148,7 @@ function resolve_all {
   done
 }
 
+function main {
+  git checkout "$(get_main_branch)"
+}
+
