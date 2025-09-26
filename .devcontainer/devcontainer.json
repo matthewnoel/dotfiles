@@ -1,0 +1,11 @@
+{
+  "name": "dotfiles",
+  "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "latest-from-nvmrc",
+      "nvmrcPath": "."
+    }
+  },
+  "postCreateCommand": "bash ./install.sh"
+}
