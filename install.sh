@@ -1,26 +1,32 @@
 #!/bin/bash
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
-# Define the location where Codespaces clones your dotfiles
-DOTFILES_DIR="/workspaces/.codespaces/.persistedshare/dotfiles"
+echo "🚀 Starting dotfiles setup..."
 
-echo "Starting dotfiles setup..."
+## --- Package Installation ---
+# Update and install Zsh and plugins. The '-qq' flag reduces verbose output.
+echo "📦 Installing Zsh and plugins..."
+sudo apt-get update -qq
+sudo apt-get install -y zsh zsh-autosuggestions zsh-syntax-highlighting -qq
 
-# 1. Copy the Zsh config file to the home directory
-if [ -f "${DOTFILES_DIR}/generic.zshrc" ]; then
-    echo "Copying generic.zshrc to ${HOME}/.zshrc"
-    cp "${DOTFILES_DIR}/generic.zshrc" "${HOME}/.zshrc"
-else
-    echo "Error: generic.zshrc not found in the dotfiles directory."
+## --- Symlink Configuration ---
+# This script assumes it's located in the root of your dotfiles repository.
+# Source path is relative to the script's location.
+# Destination path is in the home directory.
+SOURCE_ZSHRC="$(pwd)/generic.zshrc"
+DEST_ZSHRC="${HOME}/.zshrc"
+
+# Check if the source file exists before proceeding.
+if [ ! -f "$SOURCE_ZSHRC" ]; then
+    echo "❌ Error: Source file not found at ${SOURCE_ZSHRC}"
+    exit 1
 fi
 
-# 2. (Optional) Set Zsh as the default shell
-# This command changes the default shell for the current user inside the container.
-# It requires the 'zsh' package to be installed, which is common in Codespaces.
-if command -v zsh &> /dev/null; then
-    echo "Setting Zsh as the default shell..."
-    chsh -s "$(command -v zsh)"
-else
-    echo "Zsh command not found. Skipping default shell change."
-fi
+echo "🔗 Creating symlink for .zshrc..."
+# Create a symbolic link. The '-f' flag forces overwriting if the
+# destination file already exists.
+ln -sf "$SOURCE_ZSHRC" "$DEST_ZSHRC"
 
-echo "Dotfiles setup complete! Please start a new terminal session for changes to take effect."
+echo "✅ Dotfiles setup complete! Your .zshrc is now linked."
+echo "💡 The new configuration will be active in the next terminal session."
