@@ -2,19 +2,7 @@
 alias status='git status && git branch'
 alias ls='ls -la'
 alias zshrc='code ~/.zshrc'
-
-# Environment-specific aliases and configurations
-if [ "$ENVIRONMENT" = "codespaces" ]; then
-    # Codespaces-specific aliases
-    alias notes='code --new-window ~/workspaces/today.md'
-    # Add Codespaces workspace to PATH if it exists
-    if [ -d "/workspaces" ]; then
-        export WORKSPACES_DIR="/workspaces"
-    fi
-else
-    # Local computer aliases
-    alias notes='code --new-window ~/Desktop/today.md'
-fi
+alias notes='code --new-window ~/Desktop/today.md'
 
 function get_main_branch {
   local remote=$(git remote)
