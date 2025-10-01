@@ -100,10 +100,10 @@ if [ -f "$HOME/.zprofile" ]; then
     cp "$HOME/.zprofile" "$HOME/.zprofile.backup"
 fi
 
-# Add dotfiles sourcing to .zprofile
+# Add dotfiles sourcing to both .zprofile and .zshrc
 DOTFILES_SOURCE_LINE='[[ ! -f ~/dotfiles/generic.zshrc ]] || source ~/dotfiles/generic.zshrc'
 
-# Check if the line already exists in .zprofile
+# Add to .zprofile (for login shells)
 if [ -f "$HOME/.zprofile" ] && grep -Fxq "$DOTFILES_SOURCE_LINE" "$HOME/.zprofile"; then
     print_success "Dotfiles already sourced in .zprofile"
 else
@@ -112,6 +112,17 @@ else
     echo "# Dotfiles" >> "$HOME/.zprofile"
     echo "$DOTFILES_SOURCE_LINE" >> "$HOME/.zprofile"
     print_success "Added dotfiles source to .zprofile"
+fi
+
+# Add to .zshrc (for interactive shells - this is what Codespaces uses)
+if [ -f "$HOME/.zshrc" ] && grep -Fxq "$DOTFILES_SOURCE_LINE" "$HOME/.zshrc"; then
+    print_success "Dotfiles already sourced in .zshrc"
+else
+    print_status "Adding dotfiles source to .zshrc"
+    echo "" >> "$HOME/.zshrc"
+    echo "# Dotfiles" >> "$HOME/.zshrc"
+    echo "$DOTFILES_SOURCE_LINE" >> "$HOME/.zshrc"
+    print_success "Added dotfiles source to .zshrc"
 fi
 
 # Install additional tools for Codespaces
