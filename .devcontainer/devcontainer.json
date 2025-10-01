@@ -5,7 +5,7 @@
     "ghcr.io/devcontainers/features/git:1": {},
     "ghcr.io/devcontainers/features/github-cli:1": {}
   },
-  "postCreateCommand": "bash ~/dotfiles/install.sh",
+  "postCreateCommand": "bash -c 'if [ -f /workspaces/.codespaces/.persistedshare/dotfiles/install.sh ]; then bash /workspaces/.codespaces/.persistedshare/dotfiles/install.sh; elif [ -f ~/dotfiles/install.sh ]; then bash ~/dotfiles/install.sh; else echo \"Dotfiles not found - please ensure the repository is accessible\"; fi'",
   "customizations": {
     "vscode": {
       "settings": {
