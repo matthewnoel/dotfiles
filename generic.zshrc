@@ -1,16 +1,3 @@
-# Environment detection
-if [ -n "$CODESPACES" ]; then
-    export ENVIRONMENT="codespaces"
-elif [ -n "$WSL_DISTRO_NAME" ]; then
-    export ENVIRONMENT="wsl"
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    export ENVIRONMENT="macos"
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    export ENVIRONMENT="linux"
-else
-    export ENVIRONMENT="unknown"
-fi
-
 # Aliases
 alias status='git status && git branch'
 alias ls='ls -la'
