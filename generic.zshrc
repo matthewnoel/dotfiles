@@ -1,7 +1,33 @@
+# Environment detection
+if [ -n "$CODESPACES" ]; then
+    export ENVIRONMENT="codespaces"
+elif [ -n "$WSL_DISTRO_NAME" ]; then
+    export ENVIRONMENT="wsl"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    export ENVIRONMENT="macos"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    export ENVIRONMENT="linux"
+else
+    export ENVIRONMENT="unknown"
+fi
+
+# Aliases
 alias status='git status && git branch'
-alias notes='code --new-window ~/Desktop/today.md'
 alias ls='ls -la'
 alias zshrc='code ~/.zshrc'
+
+# Environment-specific aliases and configurations
+if [ "$ENVIRONMENT" = "codespaces" ]; then
+    # Codespaces-specific aliases
+    alias notes='code --new-window ~/workspaces/today.md'
+    # Add Codespaces workspace to PATH if it exists
+    if [ -d "/workspaces" ]; then
+        export WORKSPACES_DIR="/workspaces"
+    fi
+else
+    # Local computer aliases
+    alias notes='code --new-window ~/Desktop/today.md'
+fi
 
 function get_main_branch {
   local remote=$(git remote)

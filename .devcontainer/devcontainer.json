@@ -1,11 +1,17 @@
 {
-  "name": "dotfiles",
-  "image": "mcr.microsoft.com/devcontainers/universal:2-linux",
+  "name": "Dotfiles Development",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "latest-from-nvmrc",
-      "nvmrcPath": "."
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "postCreateCommand": "bash ~/dotfiles/install.sh",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
     }
   },
-  "postCreateCommand": "bash ./install.sh"
+  "remoteUser": "vscode"
 }
