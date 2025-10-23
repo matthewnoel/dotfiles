@@ -3,6 +3,7 @@ alias status='git status && git branch'
 alias ls='ls -la'
 alias zshrc='code ~/.zshrc'
 alias notes='code --new-window ~/Desktop/today.md'
+alias restore='git status --porcelain | awk '\''/^( M|\?\?)/ {print $2}'\'' | xargs -r git restore'
 
 function get_main_branch {
   local remote=$(git remote)
