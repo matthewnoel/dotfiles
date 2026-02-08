@@ -4,6 +4,7 @@ alias ls='ls -la'
 alias zshrc='code ~/.zshrc'
 alias notes='code --new-window ~/Desktop/today.md'
 alias restore='git restore . && git clean -fd'
+alias node-default='nvm alias default $(nvm current)'
 
 function get_main_branch {
   local remote=$(git remote)
