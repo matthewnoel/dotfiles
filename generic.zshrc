@@ -155,3 +155,6 @@ function main {
   git checkout "$(get_main_branch)"
 }
 
+# Self-update dotfiles in the background
+(git -C ~/dotfiles pull --quiet &>/dev/null &)
+
