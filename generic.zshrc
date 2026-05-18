@@ -155,6 +155,36 @@ function main {
   git checkout "$(get_main_branch)"
 }
 
+function tree {
+  local name=$1
+  if [ -z "$name" ]; then
+    echo "Cannot find worktree without a name."
+    return
+  fi
+
+  local is_in_repository=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  if [ "$is_in_repository" != "true" ]; then
+    echo "Cannot find worktree if the current directory is not a git repository."
+    return
+  fi
+
+  local worktree_path=$(git worktree list --porcelain | awk -v name="$name" '
+    /^worktree / { path=$2 }
+    /^branch / {
+      branch=$2
+      sub("^refs/heads/", "", branch)
+      if (branch == name) { print path; exit }
+    }
+  ')
+  if [ -z "$worktree_path" ]; then
+    echo "No worktree found matching '$name'."
+    return
+  fi
+
+  echo "Changing directory to '$worktree_path'."
+  cd "$worktree_path"
+}
+
 # Self-update dotfiles in the background
 (git -C ~/dotfiles pull --quiet &>/dev/null &)
 
