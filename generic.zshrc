@@ -1,8 +1,8 @@
 # Aliases
 alias status='git status && git branch'
 alias ls='ls -la'
-alias zshrc='code ~/.zshrc'
-alias notes='code --new-window ~/Desktop/today.md'
+alias zshrc='zed ~/.zshrc'
+alias notes='zed --new-window ~/Desktop/today.md'
 alias restore='git restore . && git clean -fd'
 alias node-default='nvm alias default $(nvm current)'
 
@@ -187,4 +187,3 @@ function tree {
 
 # Self-update dotfiles in the background
 (git -C ~/dotfiles pull --quiet &>/dev/null &)
-
