@@ -191,19 +191,35 @@ function issues {
     max_title=40
   fi
 
-  local owners
-  owners=($(gh api user --jq '.login') $(gh api user/orgs --paginate --jq '.[].login'))
-  if [ ${#owners[@]} -eq 0 ]; then
+  local all_owners
+  all_owners=($(gh api user --jq '.login') $(gh api user/orgs --paginate --jq '.[].login'))
+  if [ ${#all_owners[@]} -eq 0 ]; then
     echo "Cannot list issues without a working 'gh' login."
     return
   fi
-  echo "Owners: ${owners[*]}"
 
+  # Owners to skip, from $ISSUES_DOTFILE_IGNORE_LIST (comma and/or space separated).
+  local ignored=(${(L)${(s:,:)${ISSUES_DOTFILE_IGNORE_LIST//[[:space:]]/,}}})
+
+  local owners=()
   local owner_flags=()
   local owner
-  for owner in $owners; do
+  for owner in $all_owners; do
+    if [ -n "${ignored[(r)${(L)owner}]}" ]; then
+      continue
+    fi
+    owners+=("$owner")
     owner_flags+=(--owner "$owner")
   done
+  if [ ${#owners[@]} -eq 0 ]; then
+    echo "Cannot list issues if every owner is ignored: ${all_owners[*]}"
+    return
+  fi
+
+  echo "Owners: ${owners[*]}"
+  if [ ${#ignored[@]} -gt 0 ]; then
+    echo "Ignored: ${ignored[*]}"
+  fi
 
   local open_issues
   open_issues=$(gh search issues \
