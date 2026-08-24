@@ -1,8 +1,8 @@
 # Aliases
 alias status='git status && git branch'
 alias ls='ls -la'
-alias zshrc='code ~/.zshrc'
-alias notes='code --new-window ~/Desktop/today.md'
+alias zshrc='zed ~/.zshrc'
+alias notes='zed --new-window ~/Desktop/today.md'
 alias restore='git restore . && git clean -fd'
 alias node-default='nvm alias default $(nvm current)'
 
@@ -185,6 +185,59 @@ function tree {
   cd "$worktree_path"
 }
 
+function issues {
+  local max_title=$(( ${COLUMNS:-100} - 12 ))
+  if [ "$max_title" -lt 40 ]; then
+    max_title=40
+  fi
+
+  local owners
+  owners=($(gh api user --jq '.login') $(gh api user/orgs --paginate --jq '.[].login'))
+  if [ ${#owners[@]} -eq 0 ]; then
+    echo "Cannot list issues without a working 'gh' login."
+    return
+  fi
+  echo "Owners: ${owners[*]}"
+
+  local owner_flags=()
+  local owner
+  for owner in $owners; do
+    owner_flags+=(--owner "$owner")
+  done
+
+  local open_issues
+  open_issues=$(gh search issues \
+    $owner_flags \
+    --state open \
+    --archived=false \
+    --limit 1000 \
+    --json repository,number,title \
+    --jq '.[] | [.repository.nameWithOwner, .number, .title] | @tsv')
+  if [ $? -ne 0 ]; then
+    echo "Cannot list issues if the search fails."
+    return
+  fi
+
+  if [ -z "$open_issues" ]; then
+    echo "No open issues found."
+    return
+  fi
+
+  echo "$open_issues" | sort -t $'\t' -k1,1 -k2,2nr | awk -F '\t' -v max="$max_title" '
+    $1 != repo {
+      repo = $1
+      printf "\n\033[1;34m%s\033[0m\n", repo
+    }
+    {
+      title = $3
+      if (length(title) > max) {
+        title = substr(title, 1, max - 1) "\xe2\x80\xa6"
+      }
+      printf "  \033[33m#%-5s\033[0m %s\n", $2, title
+    }
+    END { printf "\n" }
+  '
+}
+
 # Self-update dotfiles in the background
 (git -C ~/dotfiles pull --quiet &>/dev/null &)
-
