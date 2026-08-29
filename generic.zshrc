@@ -227,8 +227,8 @@ function issues {
     --state open \
     --archived=false \
     --limit 1000 \
-    --json repository,number,title \
-    --jq '.[] | [.repository.nameWithOwner, .number, .title] | @tsv')
+    --json repository,number,title,url \
+    --jq '.[] | [.repository.nameWithOwner, .number, .title, .url] | @tsv')
   if [ $? -ne 0 ]; then
     echo "Cannot list issues if the search fails."
     return
@@ -240,16 +240,27 @@ function issues {
   fi
 
   echo "$open_issues" | sort -t $'\t' -k1,1 -k2,2nr | awk -F '\t' -v max="$max_title" '
+    # OSC 8 hyperlink; terminals without support just print the text.
+    function link(url, text) {
+      return sprintf("\033]8;;%s\033\\%s\033]8;;\033\\", url, text)
+    }
     $1 != repo {
       repo = $1
-      printf "\n\033[1;34m%s\033[0m\n", repo
+      repo_url = $4
+      sub(/\/(issues|pull)\/[0-9]+$/, "", repo_url)
+      printf "\n\033[1;34m%s\033[0m\n", link(repo_url, repo)
     }
     {
       title = $3
       if (length(title) > max) {
         title = substr(title, 1, max - 1) "\xe2\x80\xa6"
       }
-      printf "  \033[33m#%-5s\033[0m %s\n", $2, title
+      number = "#" $2
+      pad = 7 - length(number)
+      if (pad < 1) {
+        pad = 1
+      }
+      printf "  \033[33m%s\033[0m%*s%s\n", link($4, number), pad, "", title
     }
     END { printf "\n" }
   '
